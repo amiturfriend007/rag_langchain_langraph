@@ -1,0 +1,5 @@
+Q: What is LangChain?
+A: LangChain is a framework to build applications with LLMs that can use external data and tools.
+
+Q: Which local model is used in this project?
+A: llama3.2:1b
