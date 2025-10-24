@@ -16,6 +16,13 @@ def build_vector_db():
     embeddings = OllamaEmbeddings(model="llama3.2:1b")
     db = Chroma.from_documents(chunks, embeddings)
     return db
+def verbose_lambda(func):
+    def wrapper(x):
+        print(f"\n[VERBOSE] Input: {x}")
+        out = func(x)
+        print(f"[VERBOSE] Output: {out}\n")
+        return out
+    return wrapper
 
 def get_qa_chain():
     db = build_vector_db()
@@ -23,7 +30,12 @@ def get_qa_chain():
     llm = OllamaLLM(model="llama3.2:1b")
 
     prompt = ChatPromptTemplate.from_template(
-        """You are an intelligent assistant. Use the following context to answer the question.
+        """You are an intelligent assistant. 
+        Use the following context to answer the question. 
+
+        Answer **exactly in 5 words**. 
+        After every word, append the word "Shubhra". 
+
         Context: {context}
         Question: {question}
         Answer:"""
@@ -33,10 +45,10 @@ def get_qa_chain():
         return "\n\n".join([d.page_content for d in docs])
 
     chain = RunnableLambda(
-    lambda q: {
+    verbose_lambda(lambda q: {
         "question": q,
         "context": format_docs(retriever.invoke(q))
-    }
+    })
 )
 
     return chain
